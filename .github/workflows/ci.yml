@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  no-personal-files:
+    name: No personal documents in the repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject scans and images outside allowed folders
+        run: |
+          bad=$(git ls-files | grep -iE '\.(pdf|png|jpe?g|tiff?|heic|webp|bmp)$' \
+                | grep -vE '^(tests/fixtures/synthetic|docs/assets)/' || true)
+          if [ -n "$bad" ]; then
+            echo "These files look like documents or images and are not allowed here:"
+            echo "$bad"
+            echo "Real documents must never be committed. Synthetic test files go in tests/fixtures/synthetic/."
+            exit 1
+          fi
+
+  rust:
+    name: Rust build and tests
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('**/Cargo.toml') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --all

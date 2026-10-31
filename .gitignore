@@ -1,0 +1,49 @@
+# --- Personal documents must never be committed -------------------------
+# Real scans live outside the repository (or in samples/, which is ignored).
+# Only synthetic, made-up test documents may be committed, under
+# tests/fixtures/synthetic/.
+*.pdf
+*.PDF
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.heic
+*.webp
+*.bmp
+!tests/fixtures/synthetic/**
+!docs/assets/**
+samples/
+*.vault/
+*.vaultbackup
+
+# --- Rust / Tauri --------------------------------------------------------
+target/
+**/src-tauri/gen/
+
+# --- Node / UI -----------------------------------------------------------
+node_modules/
+dist/
+.vite/
+
+# --- Python worker -------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+build/
+*.spec
+
+# --- Secrets and local settings ------------------------------------------
+.env
+.env.*
+*.key
+*.pem
+
+# --- Editors and OS ------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
