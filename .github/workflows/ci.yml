@@ -28,13 +28,26 @@ jobs:
   rust:
     name: Rust build and tests
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('**/Cargo.toml') != '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Check for Rust code
+        id: detect
+        run: |
+          if git ls-files | grep -q 'Cargo.toml$'; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No Cargo.toml yet; skipping Rust checks."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo fmt --all -- --check
-      - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test --all
+      - if: steps.detect.outputs.present == 'true'
+        uses: Swatinem/rust-cache@v2
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo fmt --all -- --check
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo clippy --all-targets -- -D warnings
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo test --all
