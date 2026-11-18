@@ -31,6 +31,20 @@ The design is described in [docs/architecture.md](docs/architecture.md). In shor
 
 Design decisions are recorded in [docs/adr/](docs/adr/).
 
+## Trying the vault core
+
+Milestone 1 has started with the Rust vault core (`crates/warca-core`) and a small command-line tool (`crates/warca-cli`). There is no desktop app yet.
+
+```sh
+cargo test --all                          # crypto test vectors, vault and CLI tests
+cargo run -p warca-cli -- --vault ~/test.vault init
+cargo run -p warca-cli -- --vault ~/test.vault import --tag identity some-file.pdf
+cargo run -p warca-cli -- --vault ~/test.vault list
+cargo run -p warca-cli -- --help          # export, edit, tags, verify, passwd, recover...
+```
+
+The first build compiles SQLCipher and OpenSSL from source, so it takes a few minutes and needs a C compiler and Perl.
+
 ## Roadmap
 
 Work is organised in [milestones](https://github.com/charif-h/warca/milestones):

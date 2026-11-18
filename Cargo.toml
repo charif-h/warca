@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["crates/warca-core", "crates/warca-cli"]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.80"
+publish = false
+
+# Argon2id with production parameters is very slow without optimisation, so
+# dependencies are optimised even in debug builds. Our own code stays debuggable.
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.test.package."*"]
+opt-level = 3

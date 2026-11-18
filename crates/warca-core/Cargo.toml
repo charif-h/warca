@@ -1,0 +1,29 @@
+[package]
+name = "warca-core"
+version = "0.1.0"
+description = "Encrypted vault core for Warca: crypto format, object store, database and import"
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+aes-gcm = "0.10"
+argon2 = "0.5"
+base64 = "0.22"
+bip39 = { version = "2", features = ["zeroize"] }
+hex = "0.4"
+hkdf = "0.12"
+hmac = "0.12"
+rand = "0.8"
+rusqlite = { version = "0.32", features = ["bundled-sqlcipher-vendored-openssl"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "1"
+time = { version = "0.3", features = ["formatting", "parsing"] }
+ulid = "1"
+unicode-normalization = "0.1"
+zeroize = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
