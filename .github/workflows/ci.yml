@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  no-personal-files:
+    name: No personal documents in the repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject scans and images outside allowed folders
+        run: |
+          bad=$(git ls-files | grep -iE '\.(pdf|png|jpe?g|tiff?|heic|webp|bmp)$' \
+                | grep -vE '^(tests/fixtures/synthetic|docs/assets)/' || true)
+          if [ -n "$bad" ]; then
+            echo "These files look like documents or images and are not allowed here:"
+            echo "$bad"
+            echo "Real documents must never be committed. Synthetic test files go in tests/fixtures/synthetic/."
+            exit 1
+          fi
+
+  rust:
+    name: Rust build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for Rust code
+        id: detect
+        run: |
+          if git ls-files | grep -q 'Cargo.toml$'; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No Cargo.toml yet; skipping Rust checks."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - if: steps.detect.outputs.present == 'true'
+        uses: Swatinem/rust-cache@v2
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo fmt --all -- --check
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo clippy --all-targets -- -D warnings
+      - if: steps.detect.outputs.present == 'true'
+        run: cargo test --all
